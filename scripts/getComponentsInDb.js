@@ -38,4 +38,4 @@ async function getComponentsInDb({ packegeName = 'react-icons'}) {
   }
 }
 
-getComponentsInDb({ packegeName: '@heroicons' }).catch(console.error);
+getComponentsInDb({ packegeName: '@mui' }).catch(console.error);

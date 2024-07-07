@@ -4,7 +4,7 @@ const { scanComponents } = require("./findR");
 const { scanComponentsExec } = require("./testComponents");
 const insertData = require('../db/insert');
 
-const packageName = 'react-icons';  // Cambiar según el paquete a analizar
+const packageName = '@mui';  // Cambiar según el paquete a analizar
 
 async function updateComponentsInDb(packageName) {
   // Intentar encontrar componentes con análisis estático

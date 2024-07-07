@@ -10,15 +10,16 @@
     "install-export": "node ./scripts/execute.js",
     "get-components": "node ./scripts/getComponentsInDb.js",
     "test-component": "node ./scripts/testComponents.js",
-    "build:webpack": "webpack --config ./webpack.config.js"
+    "build:webpack": "webpack --config ./webpack.config.js",
+    "test-script": "node ./scripts/findComponentes.mjs"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@babel/parser": "^7.24.5",
-    "@babel/preset-env": "^7.24.5",
-    "@babel/preset-react": "^7.24.1",
+    "@babel/preset-env": "^7.24.7",
+    "@babel/preset-react": "^7.24.7",
     "@babel/traverse": "^7.24.5",
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
@@ -36,14 +37,16 @@
     "mongodb": "^6.6.1",
     "morgan": "^1.10.0",
     "react": "^18.3.1",
+    "react-docgen": "^7.0.3",
     "react-icons": "^5.2.0",
+    "react-scanner": "^1.1.0",
     "webpack": "^5.91.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.24.5",
+    "@babel/core": "^7.24.7",
     "@babel/preset-typescript": "^7.24.1",
     "@types/node": "^20.12.10",
-    "typescript": "^5.4.5",
+    "typescript": "^4.6.4",
     "webpack-cli": "^5.1.4"
   }
 }
