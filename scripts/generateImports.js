@@ -31,7 +31,11 @@ async function generateImports({ packageName }) {
             const importPath = value.path;
             const importName = key + parentPath.replace(/\//g, '_');
 
-            imports.push(`import ${importName} from '${importPath}';`);
+            if (value.componentInfo.type && value.componentInfo.type === 'batch') {
+              imports.push(`import * as ${importName} from '${importPath}';`);
+            } else {
+              imports.push(`import ${importName} from '${importPath}';`);
+            }
 
             const segments = parentPath.split('/').filter(segment => segment !== '');
             let current = componentsObject;
@@ -96,4 +100,4 @@ function generateStringFromObject(obj) {
 }
 
 // Llama a la función generateImports con el paquete deseado
-generateImports({ packageName: '@heroicons' }).catch(console.error);
+generateImports({ packageName: 'react-icons' }).catch(console.error);

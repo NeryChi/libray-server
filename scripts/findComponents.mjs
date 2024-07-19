@@ -18,19 +18,30 @@ function getDisplayNameFromPath(filePath) {
 async function parseTypeScriptDeclarations(filePath, output) {
   try {
     const content = await fs.readFile(filePath, 'utf8');
-    const iconDeclarations = content.match(/export declare const (\w+): IconType;/g);
-    
-    if (iconDeclarations) {
-      iconDeclarations.forEach(declaration => {
-        const iconName = declaration.match(/export declare const (\w+): IconType;/)[1];
-        const formattedPath = formatPath(filePath).replace('index.d.ts', `${iconName}.js`);
-        const componentInfo = {
-          description: 'Componente de Icono de React',
-          displayName: iconName,
-          props: {}
+    const componentDeclarations = content.match(/export declare const (\w+): \w+;/g);
+
+    if (componentDeclarations) {
+      const formattedPath = path.dirname(formatPath(filePath)); // Usar path.dirname para obtener la carpeta contenedora
+      const folderName = path.basename(formattedPath); // Obtener el nombre de la carpeta contenedora
+
+      const exports = componentDeclarations.map(declaration => {
+        const componentName = declaration.match(/export declare const (\w+): \w+;/)[1];
+        const componentPath = formatPath(filePath).replace('index.d.ts', `${componentName}.js`);
+        return {
+          name: componentName,
+          path: componentPath,
         };
-        output.push({ path: formattedPath, componentInfo });
       });
+
+      const componentInfo = {
+        description: 'Paquete grande de exportación de componentes de React',
+        displayName: folderName,
+        props: {},
+        type: 'batch', // Añadimos la propiedad 'type' para indicar que es un lote de exportaciones
+        exports // Añadimos la lista de exportaciones
+      };
+
+      output.push({ path: formattedPath, componentInfo });
     }
   } catch (error) {
     console.error(`Error FC-004: Error al analizar las declaraciones TypeScript en el archivo ${filePath}: ${error.message}`);
@@ -55,7 +66,7 @@ async function scanDirectory(dir, output) {
 
           try {
             const componentInfo = parse(content);
-            
+
             // Ajuste para corregir el displayName si es necesario
             componentInfo.forEach(component => {
               if (component.displayName === 'ForwardRef') {
@@ -63,9 +74,8 @@ async function scanDirectory(dir, output) {
               }
               output.push({ path: formattedPath, componentInfo: component });
             });
-            
+
           } catch (error) {
-            // console.error(`Error FC-005: Error al analizar el componente en el archivo ${fullPath}: ${error.message}`);
             // Continuar la ejecución aunque ocurra un error en un componente específico
           }
         } catch (error) {
