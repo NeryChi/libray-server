@@ -1,11 +1,26 @@
 // src/components/index.js
-import Button from '@mui/material/Button/Button.js';
-import Accordion from '@mui/material/Accordion/Accordion.js';
-import * as HeroIconsComponents from '@heroicons/react/24/solid';
-import * as ReactIconsComponents from 'react-icons/fc';
+import AcadenicCapIcon_react_24_solid from '@heroicons/react/24/solid/AcademicCapIcon.js';
+import PlusIcon_react_24_solid from '@heroicons/react/20/solid/PlusIcon.js';
+import AcadenicCapIcon_react_24_outline from '@heroicons/react/24/outline/AcademicCapIcon.js';
+import PlusIcon_react_20_solid from '@heroicons/react/20/solid/PlusIcon.js';
 
 export const Libraries = {
-  MUI: {Button, Accordion},
-  HeroIcons: HeroIconsComponents,
-  ReactIcons: ReactIconsComponents
+  "@heroicons": {
+    react: {
+      24: {
+        solid: {
+          AcademicCapIcon: AcadenicCapIcon_react_24_solid,
+          PlusIcon: PlusIcon_react_24_solid
+        },
+        outline: {
+          AcademicCapIcon: AcadenicCapIcon_react_24_outline
+        }
+      },
+      20: {
+        solid: {
+          PlusIcon: PlusIcon_react_20_solid,
+        }
+      }
+    }
+  }
 };

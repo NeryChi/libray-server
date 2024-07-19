@@ -7,8 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node ./src/server.js",
     "build": "node ./scripts/buildModule.js",
-    "install-export": "node ./scripts/execute.js",
-    "get-components": "node ./scripts/getComponentsInDb.js",
+    "install-export": "node ./scripts/setComponentsInDb.js",
+    "get-components": "node ./scripts/generateImports.js",
     "test-component": "node ./scripts/testComponents.js",
     "build:webpack": "webpack --config ./webpack.config.js",
     "test-script": "node ./scripts/findComponentes.mjs"
