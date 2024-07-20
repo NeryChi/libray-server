@@ -6,69 +6,76 @@ const { getComponentsInDb } = require('./getComponentsInDb');  // Asegúrate de 
  * Genera importaciones y un objeto estructurado a partir de los componentes de un paquete.
  * 
  * @param {Object} params - Parámetros para la función.
- * @param {string} params.packageName - Nombre del paquete a recuperar.
+ * @param {string|string[]} params.packageName - Nombre del paquete o array de nombres de paquetes a recuperar.
  */
 async function generateImports({ packageName }) {
   try {
-    const componentsData = await getComponentsInDb({ packageName });
-
     const imports = [];
-    const componentsObject = {};
+    const librariesObject = {};
 
-    /**
-     * Procesa los componentes para generar las importaciones y el objeto estructurado.
-     * 
-     * @param {Object} node - Nodo a procesar.
-     * @param {string} parentPath - Ruta del padre.
-     * @param {Object} currentObject - Objeto actual en el que se almacenan los componentes.
-     */
-    function processComponents(node, parentPath, currentObject) {
-      for (const key in node) {
-        if (node.hasOwnProperty(key)) {
-          const value = node[key];
+    // Asegurarse de que packageName sea un array
+    const packageNames = Array.isArray(packageName) ? packageName : [packageName];
 
-          if (value.path && value.componentInfo) {
-            const importPath = value.path;
-            const importName = key + parentPath.replace(/\//g, '_');
+    for (const pkg of packageNames) {
+      const componentsData = await getComponentsInDb({ packageName: pkg });
 
-            if (value.componentInfo.type && value.componentInfo.type === 'batch') {
-              imports.push(`import * as ${importName} from '${importPath}';`);
-            } else {
-              imports.push(`import ${importName} from '${importPath}';`);
-            }
+      const componentsObject = {};
 
-            const segments = parentPath.split('/').filter(segment => segment !== '');
-            let current = componentsObject;
-            segments.forEach(segment => {
-              if (!current[segment]) {
-                current[segment] = {};
+      /**
+       * Procesa los componentes para generar las importaciones y el objeto estructurado.
+       * 
+       * @param {Object} node - Nodo a procesar.
+       * @param {string} parentPath - Ruta del padre.
+       * @param {Object} currentObject - Objeto actual en el que se almacenan los componentes.
+       */
+      function processComponents(node, parentPath, currentObject) {
+        for (const key in node) {
+          if (node.hasOwnProperty(key)) {
+            const value = node[key];
+
+            if (value.path && value.componentInfo) {
+              const importPath = value.path;
+              const importName = sanitizeName(key + parentPath.replace(/\//g, '_'));
+
+              if (value.componentInfo.type && value.componentInfo.type === 'batch') {
+                imports.push(`import * as ${importName} from '${importPath}';`);
+              } else {
+                imports.push(`import ${importName} from '${importPath}';`);
               }
-              current = current[segment];
-            });
 
-            if (!current[key]) {
-              current[key] = importName;
+              const segments = parentPath.split('/').filter(segment => segment !== '');
+              let current = componentsObject;
+              segments.forEach(segment => {
+                if (!current[segment]) {
+                  current[segment] = {};
+                }
+                current = current[segment];
+              });
+
+              if (!current[key]) {
+                current[key] = importName;
+              }
+            } else {
+              if (!currentObject[key]) {
+                currentObject[key] = {};
+              }
+              processComponents(value, `${parentPath}/${key}`, currentObject[key]);
             }
-          } else {
-            if (!currentObject[key]) {
-              currentObject[key] = {};
-            }
-            processComponents(value, `${parentPath}/${key}`, currentObject[key]);
           }
         }
       }
-    }
 
-    processComponents(componentsData.imports, '', componentsObject);
+      processComponents(componentsData.imports, '', componentsObject);
+      librariesObject[pkg] = componentsObject;
+    }
 
     const importsFileContent = `${imports.join('\n')}
 
-export const Libraries = {
-  "${packageName}": ${generateStringFromObject(componentsObject)}
-};
+export const Libraries = ${generateStringFromObject(librariesObject)};
 `;
 
-    const filePath = path.join(__dirname, 'imports.js');
+    // Ajuste de la ruta del archivo final
+    const filePath = path.join(__dirname, '..', 'src', 'components', 'index.js');
     fs.writeFileSync(filePath, importsFileContent, 'utf-8');
     console.log(`Imports generados y guardados en ${filePath}`);
   } catch (error) {
@@ -99,5 +106,15 @@ function generateStringFromObject(obj) {
   return recurse(obj);
 }
 
-// Llama a la función generateImports con el paquete deseado
-generateImports({ packageName: 'react-icons' }).catch(console.error);
+/**
+ * Sanitiza un nombre de variable reemplazando caracteres no válidos con guion bajo.
+ * 
+ * @param {string} name - Nombre a sanitizar.
+ * @returns {string} - Nombre sanitizado.
+ */
+function sanitizeName(name) {
+  return name.replace(/[^\w]/g, '_');
+}
+
+// Llama a la función generateImports con el paquete deseado o un array de paquetes deseados
+generateImports({ packageName: ['react-icons', '@heroicons', '@mui', 'antd'] }).catch(console.error);

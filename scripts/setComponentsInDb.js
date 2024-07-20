@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const insertData = require('../db/insert');
 
-const packageName = 'react-icons';  // Cambiar según el paquete a analizar
+const packageName = 'antd';  // Cambiar según el paquete a analizar
 
 async function setComponentsInDb(packageName) {
   try {
