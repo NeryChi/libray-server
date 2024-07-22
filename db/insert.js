@@ -5,7 +5,7 @@ const client = require("./dbconection");
  * 
  * @param {string} dbName - Nombre de la base de datos.
  * @param {string} collectionName - Nombre de la colección.
- * @param {Object} data - Objeto con las propiedades `package` e `imports` a insertar.
+ * @param {Object} data - Objeto con los datos a insertar.
  */
 async function insertData({ dbName, collectionName, data }) {
   try {
@@ -17,14 +17,12 @@ async function insertData({ dbName, collectionName, data }) {
     const db = client.db(dbName);
     const collection = db.collection(collectionName);
 
-    // Convertir el objeto `data` en un array de un solo documento para insertMany
-    const dataArray = [data];
-
     // Insertar datos
-    const result = await collection.insertMany(dataArray);
-    console.log(`Documentos insertados: ${result.insertedCount}`);
+    const result = await collection.insertOne(data);
+    return;
   } catch (e) {
     console.error(e);
+    throw new Error(`Error al insertar datos: ${e.message}`);
   } finally {
     // Cerrar la conexión
     await client.close();

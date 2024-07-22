@@ -3,21 +3,22 @@ const path = require('path');
 const { getComponentsInDb } = require('./getComponentsInDb');  // Asegúrate de que la ruta es correcta
 
 /**
- * Genera importaciones y un objeto estructurado a partir de los componentes de un paquete.
+ * Genera importaciones y un objeto estructurado a partir de los componentes de una colección.
  * 
  * @param {Object} params - Parámetros para la función.
- * @param {string|string[]} params.packageName - Nombre del paquete o array de nombres de paquetes a recuperar.
+ * @param {string} params.collectionName - Nombre de la colección a recuperar.
  */
-async function generateImports({ packageName }) {
+async function generateImports({ collectionName }) {
   try {
     const imports = [];
     const librariesObject = {};
 
-    // Asegurarse de que packageName sea un array
-    const packageNames = Array.isArray(packageName) ? packageName : [packageName];
+    // Obtener los datos de los paquetes desde la colección
+    const packagesData = await getComponentsInDb({ collectionName });
 
-    for (const pkg of packageNames) {
-      const componentsData = await getComponentsInDb({ packageName: pkg });
+    for (const pkgData of packagesData) {
+      const packageName = pkgData.package;
+      const componentsData = pkgData.imports;
 
       const componentsObject = {};
 
@@ -65,8 +66,8 @@ async function generateImports({ packageName }) {
         }
       }
 
-      processComponents(componentsData.imports, '', componentsObject);
-      librariesObject[pkg] = componentsObject;
+      processComponents(componentsData, '', componentsObject);
+      librariesObject[packageName] = componentsObject;
     }
 
     const importsFileContent = `${imports.join('\n')}
@@ -116,5 +117,7 @@ function sanitizeName(name) {
   return name.replace(/[^\w]/g, '_');
 }
 
-// Llama a la función generateImports con el paquete deseado o un array de paquetes deseados
-generateImports({ packageName: ['react-icons', '@heroicons', '@mui', 'antd'] }).catch(console.error);
+// Llama a la función generateImports con el nombre de la colección deseada
+generateImports({ collectionName: 'roberto' }).catch(error => {
+  console.error(`Error al generar las importaciones: ${error.message}`);
+});

@@ -1,5 +1,3 @@
-const fs = require('fs');
-const path = require('path');
 const selectData = require('../db/select');
 
 /**
@@ -31,28 +29,31 @@ function removeDuplicateNodes(node) {
 }
 
 /**
- * Recupera los componentes de la base de datos y retorna los datos procesados.
+ * Recupera todos los documentos de la colección de un usuario y retorna los datos procesados.
  * 
  * @param {Object} params - Parámetros para la función.
- * @param {string} params.packageName - Nombre del paquete a recuperar.
- * @returns {Object} - Datos procesados sin nodos duplicados anidados.
+ * @param {string} params.collectionName - Nombre de la colección (usuario).
+ * @returns {Array} - Datos procesados sin nodos duplicados anidados.
  */
-async function getComponentsInDb({ packageName = 'abc' }) {
+async function getComponentsInDb({ collectionName }) {
   const dbName = 'library-server';
-  const collectionName = packageName;
-  const query = {}; // Ajusta tu consulta según sea necesario
+  const query = {}; // Recuperar todos los documentos
   const projection = {}; // Ajusta tu proyección según sea necesario
 
   try {
     const rawData = await selectData({ dbName, collectionName, query, projection });
-    const data = Array.isArray(rawData) && rawData.length > 0 ? rawData[0] : rawData;
+    const data = Array.isArray(rawData) ? rawData : [rawData];
 
-    if (!data || !data.imports) {
-      throw new Error('Datos inválidos recuperados de la base de datos');
+    if (data.length === 0) {
+      throw new Error('No se encontraron datos en la base de datos');
     }
 
-    const correctedData = removeDuplicateNodes(data.imports);
-    return { ...data, imports: correctedData };
+    const processedData = data.map(doc => {
+      const correctedData = removeDuplicateNodes(doc.imports);
+      return { ...doc, imports: correctedData };
+    });
+
+    return processedData;
   } catch (e) {
     console.error('Error al recuperar los datos:', e);
     throw e;

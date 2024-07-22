@@ -1,10 +1,15 @@
-const fs = require('fs');
-const path = require('path');
-const insertData = require('../db/insert');
+const updateData = require('../db/update');
 
-const packageName = 'antd';  // Cambiar según el paquete a analizar
-
-async function setComponentsInDb(packageName) {
+/**
+ * Configura y actualiza los componentes en la base de datos.
+ * 
+ * @param {Object} params - Parámetros para la función.
+ * @param {string} params.collectionName - Nombre de la colección que corresponde al usuario.
+ * @param {string} params.packageName - Nombre del paquete a analizar.
+ * @param {string} params.version - Versión de la librería.
+ * @returns {string} - Mensaje de éxito o error.
+ */
+async function setComponentsInDb({ collectionName, packageName, version }) {
   try {
     // Importar el módulo ES dinámicamente
     const { findComponents } = await import('./findComponents.mjs');
@@ -24,19 +29,26 @@ async function setComponentsInDb(packageName) {
 
     const componentsData = {
       package: packageName,
+      version: version,
       imports: componentsTree
     };
 
-    // Insertar datos en MongoDB si se encontraron componentes
-    const dataForInsertion = {
+    // Verificar si el documento ya existe y decidir si se debe actualizar o insertar
+    const query = { package: packageName };
+    const updateResult = await updateData({
       dbName: "library-server",
-      collectionName: packageName,
-      data: componentsData  // Pasar el objeto directamente
-    };
+      collectionName,
+      query,
+      updateData: componentsData
+    });
 
-    await insertData(dataForInsertion);
-    const successMessage = `Datos de componentes guardados para ${packageName}.`;
-    return successMessage;
+    if (updateResult === 'inserted') {
+      return `Inserción correcta para ${packageName} (versión ${version}).`;
+    } else if (updateResult === 'updated') {
+      return `Actualización correcta para ${packageName} (versión ${version}).`;
+    } else {
+      return `No se realizaron cambios en el documento`;
+    }
 
   } catch (error) {
     const errorMessage = `Error SCIDB_001: Error al establecer los componentes en la base de datos para el paquete '${packageName}': ${error.message}`;
@@ -45,12 +57,19 @@ async function setComponentsInDb(packageName) {
   }
 }
 
+/**
+ * Construye un árbol de componentes a partir de los datos encontrados.
+ * 
+ * @param {Array} components - Lista de componentes encontrados.
+ * @param {string} packageName - Nombre del paquete.
+ * @returns {Object} - Árbol de componentes.
+ */
 function buildComponentsTree(components, packageName) {
   const tree = {};
 
   components.forEach(({ path: componentPath, componentInfo }) => {
     const segments = componentPath.split('/');
-    
+
     // Eliminar el primer segmento si es igual a packageName
     if (segments[0] === packageName) {
       segments.shift();
@@ -80,7 +99,8 @@ function buildComponentsTree(components, packageName) {
   return tree;
 }
 
-setComponentsInDb(packageName).then(result => {
+// Llamada a la función principal con los parámetros correspondientes
+setComponentsInDb({ collectionName: 'roberto', packageName: 'react-icons', version: 'v3.0.2' }).then(result => {
   console.log(result);
 }).catch(error => {
   console.error(`Error SCIDB_002: Error en la ejecución principal: ${error.message}`);
