@@ -100,7 +100,7 @@ function buildComponentsTree(components, packageName) {
 }
 
 // Llamada a la función principal con los parámetros correspondientes
-setComponentsInDb({ collectionName: 'roberto', packageName: 'react-icons', version: 'v3.0.2' }).then(result => {
+setComponentsInDb({ collectionName: 'nery', packageName: '@fluentui/react-components', version: 'v3.0.2' }).then(result => {
   console.log(result);
 }).catch(error => {
   console.error(`Error SCIDB_002: Error en la ejecución principal: ${error.message}`);

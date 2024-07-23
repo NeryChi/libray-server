@@ -1,7 +1,8 @@
 const ModuleFederationPlugin = require('webpack/lib/container/ModuleFederationPlugin');
+const Libraries = require('./src/components/libraries');
 
 module.exports = {
-  entry: './src/components/index.js', // Tu punto de entrada principal
+  entry: './src/components/libraries.js', // Tu punto de entrada principal
   mode: 'development',
   target: 'web',
   output: {
@@ -11,9 +12,7 @@ module.exports = {
     new ModuleFederationPlugin({
       name: 'server',
       filename: 'remoteEntry.js',
-      exposes: {
-        './libraries': './src/components/index.js',
-      },
+      exposes: Libraries,
       shared: {
         react: { singleton: true, requiredVersion: false, strictVersion: false, eager: false },
         'react-dom': { singleton: true, requiredVersion: false, strictVersion: false, eager: false }
