@@ -1,0 +1,13 @@
+{
+  "scannedDirectory": "C:\\Users\\NeryC\\PersonalProjects\\libray-server\\scanner\\test",
+  "analysis": {
+    "analyzedFiles": [
+      "C:\\Users\\NeryC\\PersonalProjects\\libray-server\\scanner\\test\\react-components\\dist\\index.d.ts",
+      "C:\\Users\\NeryC\\PersonalProjects\\libray-server\\scanner\\test\\react-components\\dist\\unstable.d.ts",
+      "C:\\Users\\NeryC\\PersonalProjects\\libray-server\\scanner\\test\\react-components\\lib\\index.js",
+      "C:\\Users\\NeryC\\PersonalProjects\\libray-server\\scanner\\test\\react-components\\lib\\unstable\\index.js",
+      "C:\\Users\\NeryC\\PersonalProjects\\libray-server\\scanner\\test\\react-components\\lib-commonjs\\index.js",
+      "C:\\Users\\NeryC\\PersonalProjects\\libray-server\\scanner\\test\\react-components\\lib-commonjs\\unstable\\index.js"
+    ]
+  }
+}
