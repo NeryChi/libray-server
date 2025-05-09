@@ -10,7 +10,7 @@
     "build:webpack": "webpack --config ./webpack.config.js",
     "install": "node ./scripts/setComponentsInDb.js",
     "get-components": "node ./scripts/generateLibraries.js",
-    "test-script": "node ./scanner/test/astScan.js"
+    "test-script": "node ./scanner/test/processFiles.js"
   },
   "keywords": [],
   "author": "",
